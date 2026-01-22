@@ -1,6 +1,5 @@
 package controllers;
 
-
 import helpers.HashUtils;
 import models.User;
 import play.i18n.Messages;
@@ -13,7 +12,7 @@ public class Secure extends Controller {
     }
 
     public static void logout(){
-        session.clear(); // Elimina toda la sesión
+        session.remove("username");  // ya no usamos "password" en sesión
         login();
     }
 
@@ -21,12 +20,8 @@ public class Secure extends Controller {
     public static void authenticate(String username, String password) {
 
         User u = User.loadUser(username);
-
-        if (u != null && HashUtils.verifyPassword(
-                password,
-                u.getPassword(),
-                u.getSalt())) {
-
+        if (u != null && u.getPassword().equals(HashUtils.getMd5(password))){
+            // Guardamos solo identificador NO sensible
             session.put("username", username);
             Application.index();
 
